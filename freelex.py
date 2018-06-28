@@ -41,7 +41,7 @@ def rename_assets(root):
                  asset.text = newfn.replace('picture/', '', 1)
 
 def write_datfile(root):
-    with open("nzsl.dat", "w") as f:
+    with open("nzsl.dat", "w", encoding="utf8") as f:
         for entry in root.iter("entry"):
             headword = entry.attrib["id"], entry.find("headword").text
             sec = entry.find("glosssecondary")
@@ -70,7 +70,7 @@ def write_sqlitefile():
         os.unlink("nzsl.db")
     db = sqlite3.connect("nzsl.db")
     db.execute("create table words (gloss, minor, maori, picture, video, handshape, location, target)")
-    with open("nzsl.dat") as f:
+    with open("nzsl.dat", encoding="utf8") as f:
         for s in f:
             a = s.strip().split("\t")
             a.append("{}|{}|{}".format(normalise(a[0]), normalise(a[1]), normalise(a[2])))
@@ -94,4 +94,3 @@ def normalise(s):
              .replace("ī", "i")
              .replace("ō", "o")
              .replace("ū", "u"))
-
