@@ -1,3 +1,7 @@
+"""
+Copyright Kara Technologies
+Author: Farmehr Farhour
+"""
 import freelex
 import argparse
 import sys
@@ -6,6 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import shutil
 import csv
+import sentence_classifier
 
 def writeDictAsCSV(dictionary, filename):
     """saves a dictionary to a csv file"""
@@ -23,7 +28,10 @@ def writeDictAsCSV(dictionary, filename):
     f = open(os.path.join(csv_folder,filename + str(n) + ".csv"), 'w', encoding="utf-8", newline='')
     w = csv.writer(f)
     for key,value in dictionary.items():
-        w.writerow([key, value[0], value[1]])
+        row = [key]
+        for item in value:
+            row.append(item)
+        w.writerow(row)
     f.close()
     print("Created and wrote to: "+ filename + str(n) + ".csv" + ".csv")
 
@@ -39,7 +47,10 @@ def appendDictAsCSV(dictionary, filename):
     f = open(os.path.join(csv_folder,filename+".csv"), 'w', encoding="utf-8", newline='')
     w = csv.writer(f)
     for key,value in dictionary.items():
-        w.writerow([key, value[0], value[1]])
+        row = [key]
+        for item in value:
+            row.append(item)
+        w.writerow(row)
     f.close()
     print("Appended to: "+ filename + ".csv")
 
@@ -58,7 +69,10 @@ def singlish_csv(csv_filename, root):
                     singlish_sentence += " "
                 singlish_sentence += ". "
                 english_sentence = entry.find(videotranslateexample).text
-                english_nzsl_dictionary[id] = [english_sentence, singlish_sentence]
+                english_nzsl_dictionary[id] = [singlish_sentence, english_sentence]
+                english_classifications = sentence_classifier.get_nltk_classification(english_sentence)
+                for item in english_classifications:
+                    english_nzsl_dictionary[id].append(item)
     writeDictAsCSV(english_nzsl_dictionary, csv_filename)
 
 
