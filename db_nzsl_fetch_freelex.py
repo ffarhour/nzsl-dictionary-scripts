@@ -28,10 +28,15 @@ def writeDictAsCSV(dictionary, filename):
     f = open(os.path.join(csv_folder,filename + str(n) + ".csv"), 'w', encoding="utf-8", newline='')
     w = csv.writer(f)
     for key,value in dictionary.items():
-        row = [key]
-        for item in value:
-            row.append(item)
-        w.writerow(row)
+        # this is a dict that contains an entry for each example:
+        # i.e value[1] == [english, singlish, other stuff]
+        for _, item in value.items():
+            # this is a list of [english, singlish, other stuff] sentences
+            row = [key]
+            for i in item:
+				# This is a string of some kind
+                row.append(i)
+            w.writerow(row)
     f.close()
     print("Created and wrote to: "+ filename + str(n) + ".csv" + ".csv")
 
@@ -59,6 +64,7 @@ def singlish_csv(csv_filename, root):
     for entry in root.iter("entry"):
         print(entry.find("headword").text)
         id = entry.find("headwordid").text
+        english_nzsl_dictionary[id] = {}
         for videonum in range (1, 10):
             videoexample = "videoexample" + str(videonum)
             videotranslateexample = "videoexample" + str(videonum) + "translation"
@@ -69,10 +75,10 @@ def singlish_csv(csv_filename, root):
                     singlish_sentence += " "
                 singlish_sentence += ". "
                 english_sentence = entry.find(videotranslateexample).text
-                english_nzsl_dictionary[id] = [singlish_sentence, english_sentence]
+                english_nzsl_dictionary[id].update({videonum:[singlish_sentence, english_sentence]})
                 english_classifications = sentence_classifier.get_nltk_classification(english_sentence)
                 for item in english_classifications:
-                    english_nzsl_dictionary[id].append(item)
+                    english_nzsl_dictionary[id][videonum].append(item)
     writeDictAsCSV(english_nzsl_dictionary, csv_filename)
 
 
